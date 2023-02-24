@@ -1,0 +1,40 @@
+# Values to be overriden by the user during deployment
+  env:
+    #KAFKA CONNECTION
+    KAFKA_HOST: "" #Required
+    KAFKA_PASS: "" #Required
+
+    #MYSQL CONNECTION
+    MYSQL_HOST: "" #Required
+    MYSQL_INIT_PASS: "" #Required
+
+    #MONGODB CONNECTION
+    MONGO_HOST: "" #Required
+    MONGO_INIT_PASS: "" #Required
+
+    
+    ## Less Frequently Used But Configurable ##
+    
+    KAFKA_PORT: 9092   
+    MYSQL_PORT: 6446
+    MONGO_PORT: 27017 
+    MYSQL_USER: "porxie"
+    MYSQL_PASS: "porxie" 
+    KAFKA_USER: "pds"
+    MONGO_INIT_USER: "pds"
+    MYSQL_INIT_USER: "pds"
+    MONGO_TLS: '""' # Should be empty set unless using AWS DocumentDB
+
+  kafka_consumer:
+    image:
+      repository: eshanks16/kafka_consumer
+      tag: v1
+    replicaCount: 1
+    imagePullPolicy: Always
+
+  pxdelivery:
+    image:
+      repository: eshanks16/pxdelivery
+      tag: v1
+    replicaCount: 1
+    imagePullPolicy: Always

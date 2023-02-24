@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: zookeeper
+  name: zookeeper
+  namespace: px-delivery
+spec:
+  ports:
+    - name: "22181"
+      port: 22181
+      targetPort: 2181
+  selector:
+    io.kompose.service: zookeeper
+status:
+  loadBalancer: {}

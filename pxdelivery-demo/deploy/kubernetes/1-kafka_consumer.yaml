@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment                 
+metadata:
+  name: pxconsumer 
+  namespace: px-delivery         
+spec:
+  replicas: 1                    
+  selector:
+    matchLabels:
+      app: pxconsumer
+  template:                      
+    metadata:
+      labels:                    
+        app: pxconsumer
+    spec:                        
+      containers:
+      - name: consumer
+        image: eshanks16/kafka_consumer:v1
+        env:
+          - name: KAFKA_HOST
+            value: "kf-kafka-fqspde-px-delivery-0-vip.mktg-prod.pds-dns.io" #Required
+          - name: KAFKA_USER
+            value: "pds"
+          - name: KAFKA_PASS
+            value: "M69UEJvzaDbQz6miJ4F52rxLyWjunkGE69G9MdN1" #Required
+          - name: KAFKA_PORT
+            value: "9092"
+          - name: MYSQL_HOST
+            value: "my-mysql-fcq2yx-px-delivery-0-vip.mktg-prod.pds-dns.io" #Required
+          - name: MYSQL_INIT_USER
+            value: "pds"
+          - name: MYSQL_INIT_PASS
+            value: "O5vQmhJWKleNKvGe1MacT9hK1gqNsfr0s2b718r7" #Required
+          - name: MYSQL_PORT
+            value: "6446"
+          - name: MYSQL_USER
+            value: "porxie"
+          - name: MYSQL_PASS
+            value: "porxie"
+        imagePullPolicy: Always 

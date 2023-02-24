@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment                 
+metadata:
+  name: pxdelivery  
+  namespace: px-delivery         
+spec:
+  replicas: 3                    
+  selector:
+    matchLabels:
+      app: pxdelivery-web
+  template:                      
+    metadata:
+      labels:                    
+        app: pxdelivery-web
+    spec:                        
+      containers:
+      - name: pxdelivery-web
+        image: eshanks16/pxdelivery:v1
+        env:
+        - name: MONGO_INIT_USER
+          value: "pds" #Required
+        - name: MONGO_INIT_PASS
+          value: "e5w8MaDTZM3Emihn443F9o7vYmzqnQg8F6YJPaex" #Required
+        - name: MONGO_HOST
+          value: "mdb-mongo-jsl3w4-px-delivery-0-vip.mktg-prod.pds-dns.io" #Required
+        - name: MONGO_PORT
+          value: "27017" #Required
+        - name: MONGO_TLS
+          value: "" # Should be empty set unless using AWS DocumentDB
+        - name: KAFKA_HOST
+          value: "kf-kafka-fqspde-px-delivery-0-vip.mktg-prod.pds-dns.io" #Required
+        - name: KAFKA_USER
+          value: "pds" #Required
+        - name: KAFKA_PASS
+          value: "M69UEJvzaDbQz6miJ4F52rxLyWjunkGE69G9MdN1" #Required
+        - name: KAFKA_PORT
+          value: "9092" #Required
+        - name: MYSQL_HOST
+          value: "my-mysql-fcq2yx-px-delivery-0-vip.mktg-prod.pds-dns.io" #Required
+        - name: MYSQL_USER
+          value: "porxie"
+        - name: MYSQL_PASS
+          value: "porxie"
+        - name: MYSQL_PORT
+          value: "6446" #Required
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080  
+        livenessProbe:           
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:   
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pxdelivery-svc
+  namespace: px-delivery
+  labels:
+    app: pxdelivery-web
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: pxdelivery-web

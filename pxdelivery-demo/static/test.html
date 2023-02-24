@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<!--
+	Spectral by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Portworx Delivery Demo</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1><a href="index.html">Test Page</a></h1>
+						{{ if .IsAuthed }}
+							<h2>{{.IsAuthed}}</h2>
+							<nav id="navbar" class="navbar">
+								<ul>
+								  <li><a href="index.html" class="active">Home</a></li>
+								  <li><a href="/order">Order</a></li>
+								  <li><a href="/contact">Contact</a></li>
+								  <li><a class="get-a-quote" href="/login">Login</a></li>
+								</ul>
+							</nav>
+						{{ else }}
+						<nav id="navbar" class="navbar">
+							<ul>
+							  <li><a href="index.html" class="active">Home</a></li>
+							  <li><a href="/order">Order</a></li>
+							  <li><a href="/contact">Contact</a></li>
+							  <li><a class="get-a-quote" href="/login">Login</a></li>
+							</ul>
+						</nav>
+						{{ end }}
+						
+					</header>
+
+					
+

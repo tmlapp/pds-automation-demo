@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment                 
+metadata:
+  name: pxdelivery  
+  namespace: px-delivery         
+spec:
+  replicas: {{ .Values.pxdelivery.replicaCount }}                 
+  selector:
+    matchLabels:
+      app: pxdelivery-web
+  template:                      
+    metadata:
+      labels:                    
+        app: pxdelivery-web
+    spec:                        
+      containers:
+      - name: pxdelivery-web
+        image: {{ .Values.pxdelivery.image.repository }}:{{ .Values.pxdelivery.image.tag }}
+        env:
+          - name: MONGO_INIT_USER
+            value: {{ .Values.env.MONGO_INIT_USER }}
+          - name: MONGO_INIT_PASS
+            value: {{ .Values.env.MONGO_INIT_PASS }}
+          - name: MONGO_HOST
+            value: {{ .Values.env.MONGO_HOST }}
+          - name: MONGO_PORT
+            value: "{{ .Values.env.MONGO_PORT }}"
+          - name: MONGO_TLS
+            value: {{ .Values.env.MONGO_TLS }}
+          - name: KAFKA_HOST
+            value: {{ .Values.env.KAFKA_HOST }}
+          - name: KAFKA_USER
+            value: {{ .Values.env.KAFKA_USER }}
+          - name: KAFKA_PASS
+            value: {{ .Values.env.KAFKA_PASS }}
+          - name: KAFKA_PORT
+            value: "{{ .Values.env.KAFKA_PORT }}"
+          - name: MYSQL_HOST
+            value: {{ .Values.env.MYSQL_HOST }}
+          - name: MYSQL_USER
+            value: {{ .Values.env.MYSQL_USER }}
+          - name: MYSQL_PASS
+            value: {{ .Values.env.MYSQL_PASS }}
+          - name: MYSQL_PORT
+            value: "{{ .Values.env.MYSQL_PORT }}"
+        imagePullPolicy: {{ .Values.pxdelivery.imagePullPolicy }}
+        ports:
+          - containerPort: 8080  
+        livenessProbe:           
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:   
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pxdelivery-svc
+  namespace: px-delivery
+  labels:
+    app: pxdelivery-web
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: pxdelivery-web

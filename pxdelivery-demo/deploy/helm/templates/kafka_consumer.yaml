@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment                 
+metadata:
+  name: pxconsumer 
+  namespace: px-delivery         
+spec:
+  replicas: {{ .Values.kafka_consumer.replicaCount }}                     
+  selector:
+    matchLabels:
+      app: pxconsumer
+  template:                      
+    metadata:
+      labels:                    
+        app: pxconsumer
+    spec:                        
+      containers:
+      - name: consumer
+        image: {{ .Values.kafka_consumer.image.repository }}:{{ .Values.kafka_consumer.image.tag }}
+        env:
+          - name: KAFKA_HOST
+            value: {{ .Values.env.KAFKA_HOST }}
+          - name: KAFKA_USER
+            value: {{ .Values.env.KAFKA_USER }}
+          - name: KAFKA_PASS
+            value: {{ .Values.env.KAFKA_PASS }}
+          - name: KAFKA_PORT
+            value: "{{ .Values.env.KAFKA_PORT }}"
+          - name: MYSQL_HOST
+            value: {{ .Values.env.MYSQL_HOST }}
+          - name: MYSQL_INIT_USER
+            value: {{ .Values.env.MYSQL_INIT_USER }}
+          - name: MYSQL_INIT_PASS
+            value: {{ .Values.env.MYSQL_INIT_PASS }}
+          - name: MYSQL_PORT
+            value: "{{ .Values.env.MYSQL_PORT }}"
+          - name: MYSQL_USER
+            value: {{ .Values.env.MYSQL_USER }}
+          - name: MYSQL_PASS
+            value: {{ .Values.env.MYSQL_PASS }}
+        imagePullPolicy: {{ .Values.kafka_consumer.imagePullPolicy }}
