@@ -1,0 +1,157 @@
+---
+- name: spin up data services for porx
+  hosts: localhost
+  vars:
+    debug_vars: false
+    pds_api: 'https://prod.pds.portworx.com/api'
+    token: 
+    deployment_cluster: 
+    pds_namespace: 
+    pds_account: Sales
+    pds_tenant: Default
+    pds_project: Default
+    my_ds_name: 
+    pds:
+      ds:
+        kafka:
+          name: "Kafka"
+          shortname: "kf"
+          nodes: 3
+          version: "3.2.3"
+          appconfig_template: "{{ 'Small heap' | urlencode }}"
+          resource_template: "Small"
+          storage_template: "{{ 'Volume replication (best-effort spread)' | urlencode }}"
+        mongo:
+          name: "MongoDB Enterprise"
+          shortname: "mdb"
+          nodes: 1
+          version: "6.0.3"
+          appconfig_template: "Default"
+          resource_template: "Small"
+          storage_template: "{{ 'Volume replication (best-effort spread)' | urlencode }}"
+        mysql:
+          name: "MySQL"
+          shortname: "my"
+          nodes: 1
+          version: "8.0.31"
+          appconfig_template: "Default"
+          resource_template: "Small"
+          storage_template: "{{ 'Volume replication (best-effort spread)' | urlencode }}"
+
+  tasks:
+  - set_fact:
+      deploy: true
+
+  - name: get accountId
+    ansible.builtin.uri:
+      url: "{{ pds_api }}/accounts?name={{ pds_account }}"
+      headers:
+        Authorization: "Bearer {{ token }}"
+        accept: application/json
+    register: account_id
+  
+  - name: debug check
+    debug:
+      var: account_id.json.data[0].id
+    when: debug_vars
+
+  - name: get tenant
+    ansible.builtin.uri:
+      url: "{{ pds_api }}/accounts/{{ account_id.json.data[0].id }}/tenants?name={{ pds_tenant }}"
+      headers:
+        Authorization: "Bearer {{ token }}"
+        accept: application/json
+    register: tenant_id
+  
+  - name: debug check
+    debug:
+      var: tenant_id.json
+    when: debug_vars
+
+  - name: get project
+    ansible.builtin.uri:
+      url: "{{ pds_api }}/tenants/{{ tenant_id.json.data[0].id }}/projects?name={{ pds_project }}"
+      headers:
+        Authorization: "Bearer {{ token }}"
+        accept: application/json
+    register: project_id
+  
+  - name: debug check
+    debug:
+      var: project_id.json
+    when: debug_vars
+
+  - name: get deployment-targets
+    ansible.builtin.uri:
+      url: "{{ pds_api }}/tenants/{{ tenant_id.json.data[0].id }}/deployment-targets"
+      headers:
+        Authorization: "Bearer {{ token }}"
+        accept: application/json
+    register: deployment_target
+  
+  - name: set pds_deployment_target
+    set_fact:
+      pds_deployment_target: "{{ deployment_target.json|community.general.json_query(json_query)}}"
+    vars:
+      json_query: "data[?name=='{{ deployment_cluster }}'].id|[0]"
+
+  - name: debug check
+    debug:
+      var: pds_deployment_target
+    when: debug_vars
+
+  - name: get namespace
+    ansible.builtin.uri:
+      url: "{{ pds_api }}/deployment-targets/{{ pds_deployment_target }}/namespaces?name={{ pds_namespace }}"
+      headers:
+        Authorization: "Bearer {{ token }}"
+        accept: application/json
+    register: ds_namespace_id
+
+  - name: debug check
+    debug:
+      var: ds_namespace_id.json.data[0].id
+    when: debug_vars
+
+  - name: create dataservices
+    include_tasks: create_ds.yaml
+    vars:
+      local_ds: "{{ pds.ds.mongo }}"
+
+  - name: set mongo facts
+    set_fact:
+      mongo_ds: "{{ my_ds }}"
+
+  - name: create dataservices
+    include_tasks: create_ds.yaml
+    vars:
+      local_ds: "{{ pds.ds.kafka }}"
+
+  - name: set kafka facts
+    set_fact:
+      kafka_ds: "{{ my_ds }}"
+
+  - name: create dataservices
+    include_tasks: create_ds.yaml
+    vars:
+      local_ds: "{{ pds.ds.mysql }}"
+
+  - name: set kafka facts
+    set_fact:
+      mysql_ds: "{{ my_ds }}"
+
+  - name: debug check
+    debug:
+      msg: |
+        mongo var {{ mongo_ds }}
+        kafka var {{ kafka_ds }}
+        mysql var {{ mysql_ds }}
+    when: debug_vars
+ 
+- name: import appdeploy playbook
+  ansible.builtin.import_playbook: deploy_pxdelivery.yaml
+  vars:
+    kafka_ds_id: "{{ kafka_ds.json.id }}"
+    mongo_ds_id: "{{ mongo_ds.json.id }}"
+    mysql_ds_id: "{{ mysql_ds.json.id }}"
+  when: deploy

@@ -1,0 +1,20 @@
+- name: get connection
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/deployments/{{ my_ds_id }}/connection-info"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: connection
+
+- name: debug check
+  debug:
+    var: connection
+  when: debug_vars
+
+- name: get credentials
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/deployments/{{ my_ds_id }}/credentials"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: credentials

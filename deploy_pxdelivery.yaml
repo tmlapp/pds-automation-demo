@@ -1,0 +1,108 @@
+---
+- name: deploy pxdelivery app with PDS
+  hosts: localhost
+  vars:
+    #app_namespace: tml-app
+    debug_vars: false
+    pds_api: 'https://prod.pds.portworx.com/api'
+    token:
+#    kafka_ds_id: ""
+#    mongo_ds_id: ""
+#    mysql_ds_id: ""
+
+  tasks:
+  - name: sleep for pds to spin
+    pause:
+      seconds: 60
+
+  - name: wait for deployemnt
+    ansible.builtin.uri:
+      url: "{{ pds_api }}/deployments/{{ item }}/status"
+      headers:
+        Authorization: "Bearer {{ token }}"
+        accept: application/json
+    register: wait_for
+    until:
+    - wait_for.json.health == "Healthy"
+    - wait_for.json.status == "Available"
+    retries: 30
+    delay: 15
+    loop:
+    - "{{ kafka_ds_id }}"
+    - "{{ mysql_ds_id }}"
+    - "{{ mongo_ds_id }}"
+
+#  - name: get connection
+#    ansible.builtin.uri:
+#      url: "{{ pds_api }}/deployments/{{ my_ds_id }}/connection-info"
+#      headers:
+#        Authorization: "Bearer {{ token }}"
+#        accept: application/json
+#    register: connection
+#
+#  - name: debug check
+#    debug:
+#      var: connection
+#    when: debug_vars
+#
+#  - name: get credentials
+#    ansible.builtin.uri:
+#      url: "{{ pds_api }}/deployments/{{ my_ds_id }}/credentials"
+#      headers:
+#        Authorization: "Bearer {{ token }}"
+#        accept: application/json
+#    register: credentials
+#
+#  - name: debug check
+#    debug:
+#      var: credentials
+#    when: debug_vars
+
+  - name: get kafka cnx
+    include_tasks: get_cnx.yaml
+    vars:
+      my_ds_id: "{{ kafka_ds_id }}"
+
+  - name: set kafka cnx details
+    set_fact:
+      kafka_hostname: "{{ connection.json.clusterDetails.hostname }}"
+      kafka_password: "{{ credentials.json.password }}"
+
+  - name: get mongo cnx
+    include_tasks: get_cnx.yaml
+    vars:
+      my_ds_id: "{{ mongo_ds_id }}"
+
+  - name: set mongo cnx details
+    set_fact:
+      mongo_hostname: "{{ connection.json.clusterDetails.host }}"
+      mongo_password: "{{ credentials.json.password }}"
+
+  - name: get mysql cnx
+    include_tasks: get_cnx.yaml
+    vars:
+      my_ds_id: "{{ mysql_ds_id }}"
+
+  - name: set mysql cnx details
+    set_fact:
+      mysql_hostname: "{{ connection.json.clusterDetails.hostname }}"
+      mysql_password: "{{ credentials.json.password }}"
+
+  - name: debug check
+    debug:
+      msg: |
+        kf - {{ kafka_hostname }}
+        kf - {{ kafka_password }}
+        mdb - {{ mongo_hostname }}
+        mdb - {{ mongo_password }}
+        mysql - {{ mysql_hostname }}
+        mysql - {{ mysql_password }}
+    when: debug_vars
+
+  - name: deploy porx helm chart
+    kubernetes.core.helm:
+      name: pxdeliver
+      chart_ref: ./pxdelivery-demo/deploy/helm/
+      release_namespace: px-delivery
+      create_namespace: true
+      values: "{{ lookup('template', './pxdelivery-demo/deploy/helm/values.yaml.j2') | from_yaml }}"

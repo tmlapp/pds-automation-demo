@@ -1,0 +1,125 @@
+- name: debug
+  debug:
+    var: local_ds
+  when: debug_vars
+
+- name: get dataservice id
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/data-services?short_name={{ local_ds.shortname }}"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: data_service_id
+
+- name: debug check
+  debug:
+    var: data_service_id.json.data[0].id
+  when: debug_vars
+
+- name: get dataservice version
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/data-services/{{ data_service_id.json.data[0].id }}/versions?name={{ local_ds.version }}"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: ds_version_id
+
+- name: debug check
+  debug:
+    var: ds_version_id.json.data[0].id
+  when: debug_vars
+
+- name: get images
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/images?latest=true&data_service_id={{data_service_id.json.data[0].id }}&version_id={{ ds_version_id.json.data[0].id }}"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: ds_image_id
+
+- name: debug check
+  debug:
+    var: ds_image_id.json.data[0].id
+  when: debug_vars
+
+- name: get appconfig template
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/tenants/{{ tenant_id.json.data[0].id }}/application-configuration-templates?name={{ local_ds.appconfig_template }}&data_service_id={{ data_service_id.json.data[0].id }}"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: ds_appconfig_id
+
+- name: debug check
+  debug:
+    var: ds_appconfig_id.json.data[0].id
+  when: debug_vars
+
+- name: get resource template
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/tenants/{{ tenant_id.json.data[0].id }}/resource-settings-templates?name={{ local_ds.resource_template }}&data_service_id={{data_service_id.json.data[0].id }}"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: ds_resource_template_id
+
+- name: debug check
+  debug:
+    var: ds_resource_template_id.json.data[0].id
+  when: debug_vars
+
+- name: get storage template
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/tenants/{{ tenant_id.json.data[0].id }}/storage-options-templates?name={{ local_ds.storage_template }}&data_service_id={{data_service_id.json.data[0].id }}"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+  register: ds_storage_template_id
+
+- name: debug check
+  debug:
+    var: ds_storage_template_id.json.data[0].id
+  when: debug_vars
+
+- name: create body request
+  set_fact:
+    body_request:
+      name: "{{ my_ds_name }}"
+      deployment_target_id: "{{ pds_deployment_target }}"
+      namespace_id: "{{ ds_namespace_id.json.data[0].id }}"
+      resource_settings_template_id: "{{ ds_resource_template_id.json.data[0].id }}"
+      application_configuration_template_id: "{{ ds_appconfig_id.json.data[0].id }}"
+      image_id: "{{ ds_image_id.json.data[0].id }}"
+      storage_options_template_id: "{{ ds_storage_template_id.json.data[0].id }}"
+
+- name: write body request
+  copy:
+    content: "{{  body_request | to_json | from_json | combine({ 'node_count': local_ds.nodes }) }}"
+    dest: "./{{ local_ds.shortname }}_body_request.json"
+
+- name: create data service
+  ansible.builtin.uri:
+    url: "{{ pds_api }}/projects/{{ project_id.json.data[0].id }}/deployments"
+    headers:
+      Authorization: "Bearer {{ token }}"
+      accept: application/json
+    body_format: json
+    return_content: true
+    body: "{{  body_request | to_json | from_json | combine({ 'node_count': local_ds.nodes }) }}"
+    method: POST
+    status_code: 201
+  register: my_ds
+  when: deploy
+
+- name: debug check
+  debug:
+    var:  my_ds
+  when:
+  - deploy
+  - debug_vars
+
+- name: write ds info
+  copy:
+    dest: "./{{ local_ds.shortname }}-my-ds.json"
+    content: "{{ my_ds.json }}"
+  when: deploy
