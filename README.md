@@ -1,6 +1,6 @@
 # pds-automation-demo
 
-Ansible playbooks to automate the deployment of PDS databases and px-deivery application.
+Ansible playbooks to automate the deployment of PDS databases and px-delivery application.
 
 Create an API key https://pds.docs.portworx.com/user-guide/add-api-keys/
 Set it as the ```token``` variable in spin_pxdelivery.yaml and deploy_pxdelivery.yaml playbooks
