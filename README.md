@@ -1,5 +1,7 @@
 # pds-automation-demo
 
+Note: Developed on ansible core 2.14.1 and python version = 3.11.1. Earlier versions may not function as expected.
+
 Ansible playbooks to automate the deployment of PDS databases and px-delivery application.
 
 Create an API key https://pds.docs.portworx.com/user-guide/add-api-keys/
