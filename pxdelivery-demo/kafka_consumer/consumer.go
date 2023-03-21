@@ -161,13 +161,13 @@ func consumeOrders(dialer *kafka.Dialer) {
 	}
 	brokerURL := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{brokerURL},
-		Topic:     "order",
-		GroupID:   "px-delivery",
-		Partition: 0,
-		MinBytes:  10e3, // 10KB
-		MaxBytes:  10e6, // 10MB
-		Dialer:    dialer,
+		Brokers: []string{brokerURL},
+		Topic:   "order",
+		GroupID: "px-delivery",
+		//Partition: 0,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+		Dialer:   dialer,
 	})
 	defer r.Close()
 
