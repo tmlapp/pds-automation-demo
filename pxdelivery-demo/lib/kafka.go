@@ -121,8 +121,8 @@ func createTopic(dialer *kafka.Dialer, brokerURL, topicName string) error {
 	// Create topic.
 	err = controllerConn.CreateTopics(kafka.TopicConfig{
 		Topic:             topicName,
-		NumPartitions:     1,
-		ReplicationFactor: 3,
+		NumPartitions:     9,
+		ReplicationFactor: 2,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create the %s topic: %s", topicName, err)

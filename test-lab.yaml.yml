@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: pxdelivery.eks.crashloopbackoff.io
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "1800"
+  labels:
+    app.kubernetes.io/name: pxdelivery-lb-web
+  name: pxdelivery-lb-svc
+  namespace: px-delivery
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: pxdelivery-web
+  type: LoadBalancer

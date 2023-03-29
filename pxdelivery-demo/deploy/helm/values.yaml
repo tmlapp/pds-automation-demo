@@ -27,14 +27,14 @@
 
   kafka_consumer:
     image:
-      repository: eshanks16/kafka_consumer
+      repository: jowings/pxconsumer
       tag: v1
     replicaCount: 1
     imagePullPolicy: Always
 
   pxdelivery:
     image:
-      repository: eshanks16/pxdelivery
+      repository: jowings/pxdelivery
       tag: v1
     replicaCount: 1
     imagePullPolicy: Always

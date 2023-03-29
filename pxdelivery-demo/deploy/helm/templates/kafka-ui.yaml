@@ -1,0 +1,56 @@
+apiVersion: "v1"
+kind: Pod
+metadata:
+  name: kafka-ui
+  labels:
+    app: kafka-ui
+spec:
+  containers:
+    - name: kafka-ui
+      image:  provectuslabs/kafka-ui
+      env:
+      - name: KAFKA_USER
+        value: {{ .Values.env.KAFKA_USER }}
+      - name: KAFKA_PASS
+        value: {{ .Values.env.KAFKA_PASS }}
+      - name: KAFKA_PORT
+        value: "{{ .Values.env.KAFKA_PORT }}"
+      - name: KAFKA_CLUSTERS_0_NAME
+        value: {{ .Values.env.KAFKA_HOST }}:9092
+      - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+        value: {{ .Values.env.KAFKA_HOST }}:9092
+      - name: KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL
+        value: SASL_PLAINTEXT
+      - name: KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM
+        value: PLAIN     
+      - name: KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG
+        value: !!str org.apache.kafka.common.security.plain.PlainLoginModule required username="pds" password="{{ .Values.env.KAFKA_PASS }}";
+      ports:
+      - containerPort: 8080
+        name: web
+        protocol: TCP
+#      volumeMounts:
+#        - mountPath: "/tmp"
+#          name: temp-vol
+#  volumes:
+#    - name: temp-vol
+#      persistentVolumeClaim:
+#        claimName: pvc-name
+
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kafka-ui
+  name: kafka-ui
+spec:
+  ports:
+  - name: kf-ui
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: kafka-ui
+  type: LoadBalancer

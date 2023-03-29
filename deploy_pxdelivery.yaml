@@ -5,7 +5,7 @@
     #app_namespace: tml-app
     debug_vars: false
     pds_api: 'https://prod.pds.portworx.com/api'
-    token:
+    token: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5pbCIsImV4cCI6MTY4NDc3Mzk4MywiaWF0IjoxNjc3MDAxNTg3LCJpc3MiOiJwZHMtdXNlckFQSUtleSIsIm5hbWUiOiI0MmMyYTFmNy01NGRlLTQ5YWQtOGY0YS0wNTA3MTA5OWQ1YTYiLCJyb2xlcyI6bnVsbCwic3ViIjoiMjk4YzExZTAtZDRlNi00ODQyLTllMmItMzQ5ZWViYzkxNDlkIn0.Kz5s9oKUekNq2cKzgqszj6xBoT9mLpbcvO8_zkkDkSxkx_TOTin5XNTdsNOzamVwkmyQLUQTcJFUy8HNXaTEug"
 #    kafka_ds_id: ""
 #    mongo_ds_id: ""
 #    mysql_ds_id: ""

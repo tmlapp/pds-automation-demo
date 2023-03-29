@@ -4,13 +4,13 @@
   vars:
     debug_vars: false
     pds_api: 'https://prod.pds.portworx.com/api'
-    token: 
-    deployment_cluster: 
-    pds_namespace: 
+    token: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5pbCIsImV4cCI6MTY4NDc3Mzk4MywiaWF0IjoxNjc3MDAxNTg3LCJpc3MiOiJwZHMtdXNlckFQSUtleSIsIm5hbWUiOiI0MmMyYTFmNy01NGRlLTQ5YWQtOGY0YS0wNTA3MTA5OWQ1YTYiLCJyb2xlcyI6bnVsbCwic3ViIjoiMjk4YzExZTAtZDRlNi00ODQyLTllMmItMzQ5ZWViYzkxNDlkIn0.Kz5s9oKUekNq2cKzgqszj6xBoT9mLpbcvO8_zkkDkSxkx_TOTin5XNTdsNOzamVwkmyQLUQTcJFUy8HNXaTEug"
+    deployment_cluster: px4fb1
+    pds_namespace: px-delivery
     pds_account: Sales
     pds_tenant: Default
     pds_project: Default
-    my_ds_name: 
+    my_ds_name: pxd-jo
     pds:
       ds:
         kafka:
