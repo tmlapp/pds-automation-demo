@@ -5,7 +5,7 @@
     #app_namespace: tml-app
     debug_vars: false
     pds_api: 'https://prod.pds.portworx.com/api'
-    token:
+    token: 
 #    kafka_ds_id: ""
 #    mongo_ds_id: ""
 #    mysql_ds_id: ""

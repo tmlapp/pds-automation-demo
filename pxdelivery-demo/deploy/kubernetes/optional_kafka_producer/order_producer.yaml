@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-producer-kafka
+  labels:
+    app: order-producer-kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-producer-kafka
+  template:
+    metadata:
+      labels:
+        app: order-producer-kafka
+    spec:
+      containers:
+      - env:
+        - name: KF_SERVER
+          value: <kf server>
+        - name: KF_USERNAME
+          value: "pds"
+        - name: KF_PASSWORD
+          value: <pds kf pass>
+        - name: KAFKA_PORT
+          value: "9092"
+        name: order-producer-kafka
+        image: jowings/py-kafka:1.12
+        imagePullPolicy: Always
+        command: ["python3"]
+        args: ["order_producer.py"]

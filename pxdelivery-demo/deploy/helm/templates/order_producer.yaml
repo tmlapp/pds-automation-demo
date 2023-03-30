@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-producer-kafka
+  labels:
+    app: order-producer-kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-producer-kafka
+  template:
+    metadata:
+      labels:
+        app: order-producer-kafka
+    spec:
+      containers:
+      - env:
+        - name: KF_SERVER
+          value: {{ .Values.env.KAFKA_HOST }}
+        - name: KF_USERNAME
+          value: {{ .Values.env.KAFKA_USER }}
+        - name: KF_PASSWORD
+          value: {{ .Values.env.KAFKA_PASS }}
+        - name: KAFKA_PORT
+          value: "{{ .Values.env.KAFKA_PORT }}"
+        name: order-producer-kafka
+        image: jowings/py-kafka:1.12
+        imagePullPolicy: Always
+        command: ["python3"]
+        args: ["order_producer.py"]
