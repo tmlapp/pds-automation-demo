@@ -5,12 +5,12 @@
     debug_vars: false
     pds_api: 'https://prod.pds.portworx.com/api'
     token: 
-    deployment_cluster: px4fb1
-    pds_namespace: px-delivery
+    deployment_cluster: 
+    pds_namespace: 
     pds_account: Sales
     pds_tenant: Default
     pds_project: Default
-    my_ds_name: pxd-jo
+    my_ds_name: 
     pds:
       ds:
         kafka:
