@@ -85,8 +85,10 @@
 
   - name: set mysql cnx details
     set_fact:
-      mysql_hostname: "{{ connection.json.clusterDetails.hostname }}"
+      mysql_hostname: "{{ connection.json|community.general.json_query(json_query)}}"
       mysql_password: "{{ credentials.json.password }}"
+    vars:
+      json_query: "connectionDetails.nodes|[?contains(@, 'vip')]|[0]"
 
   - name: debug check
     debug:
