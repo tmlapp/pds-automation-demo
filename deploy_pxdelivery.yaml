@@ -23,8 +23,8 @@
         accept: application/json
     register: wait_for
     until:
-    - wait_for.json.health == "Healthy"
-    - wait_for.json.status == "Available"
+    - wait_for.json.status == "Deployed"
+    - wait_for.json.health == "Available"
     retries: 30
     delay: 15
     loop:
